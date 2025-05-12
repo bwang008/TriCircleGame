@@ -19,8 +19,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Configuration ---
     const MAIN_CANVAS_SIZE = 400;
     const ZOOM_CANVAS_SIZE = 200;
-    const CENTER_X = MAIN_CANVAS_SIZE / 2;
-    const CENTER_Y = MAIN_CANVAS_SIZE / 2;
+    const padding = 20;
+    const radius = Math.min(MAIN_CANVAS_SIZE, MAIN_CANVAS_SIZE) / 2 - padding;
     const ORBIT_RADIUS = 150;
     const CENTER_DOT_RADIUS = 5;
     const ORBITING_DOT_RADIUS = 8;
@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Drawing Functions (Mostly unchanged) ---
     function drawCircle(ctx, x, y, radius, color, strokeColor = null, lineWidth = 1) {
         ctx.beginPath();
-        ctx.arc(x, y, radius, 0, Math.PI * 2);
+        ctx.arc(x, y, radius, 0, 2 * Math.PI);
         if (color) { ctx.fillStyle = color; ctx.fill(); }
         if (strokeColor) { ctx.strokeStyle = strokeColor; ctx.lineWidth = lineWidth; ctx.stroke(); }
     }
@@ -115,14 +115,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // ... (Include the full drawing and geometry functions from the previous answer here) ...
      function drawMainScene() {
         mainCtx.fillStyle = '#282828'; mainCtx.fillRect(0, 0, MAIN_CANVAS_SIZE, MAIN_CANVAS_SIZE);
-        drawCircle(mainCtx, CENTER_X, CENTER_Y, ORBIT_RADIUS, null, '#555555', 1);
-        drawCircle(mainCtx, CENTER_X, CENTER_Y, CENTER_DOT_RADIUS, '#ffffff');
+        drawCircle(mainCtx, radius, radius, ORBIT_RADIUS, null, '#555555', 1);
+        drawCircle(mainCtx, radius, radius, CENTER_DOT_RADIUS, '#ffffff');
         if (gameState === 'running' || gameState === 'stopping') {
             currentDotData.forEach((dot, index) => {
                 if (gameState === 'stopping' && stoppedDots.some(d => d.configIndex === index)) return;
                 const angleRad = dot.angle * Math.PI / 180;
-                const x = CENTER_X + ORBIT_RADIUS * Math.cos(angleRad);
-                const y = CENTER_Y + ORBIT_RADIUS * Math.sin(angleRad);
+                const x = radius + ORBIT_RADIUS * Math.cos(angleRad);
+                const y = radius + ORBIT_RADIUS * Math.sin(angleRad);
                 drawCircle(mainCtx, x, y, ORBITING_DOT_RADIUS, dot.color);
             });
         }
@@ -146,7 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
              zoomInfoDisplay.textContent = 'Waiting for result...'; return;
         }
         const { line, distance, closestPointOnLine, p1, p2, p3 } = closestLineInfo;
-        const center = { x: CENTER_X, y: CENTER_Y };
+        const center = { x: radius, y: radius };
         const baseScaleUnits = ZOOM_CANVAS_SIZE * 0.3;
         const minEffectiveDistance = 5;
         const effectiveDistance = Math.max(distance, minEffectiveDistance);
@@ -265,8 +265,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const timeoutId = setTimeout(() => {
                  if (gameState !== 'stopping') return;
                 const angleRad = dot.angle * Math.PI / 180;
-                const x = CENTER_X + ORBIT_RADIUS * Math.cos(angleRad);
-                const y = CENTER_Y + ORBIT_RADIUS * Math.sin(angleRad);
+                const x = radius + ORBIT_RADIUS * Math.cos(angleRad);
+                const y = radius + ORBIT_RADIUS * Math.sin(angleRad);
                 stoppedDots.push({ x, y, configIndex: index });
                 console.log(`Dot ${index} stopped at (${x.toFixed(2)}, ${y.toFixed(2)})`);
                  drawMainScene();
@@ -285,7 +285,7 @@ document.addEventListener('DOMContentLoaded', () => {
         stoppedDots.sort((a, b) => a.configIndex - b.configIndex);
         finalTrianglePoints = stoppedDots.map(dot => ({ x: dot.x, y: dot.y }));
 
-        const centerPoint = { x: CENTER_X, y: CENTER_Y };
+        const centerPoint = { x: radius, y: radius };
         const [p1, p2, p3] = finalTrianglePoints;
 
         const actualOutcomeIsInside = isInsideTriangle(centerPoint, p1, p2, p3);

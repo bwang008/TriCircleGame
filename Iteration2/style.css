@@ -29,35 +29,23 @@ body {
 
 .main-container {
     display: flex;
-    gap: 30px; /* Space between game area and side panel */
-    align-items: flex-start;
-    flex-wrap: wrap;
     justify-content: center;
-    /* Remove margin-top as body padding now handles spacing */
-    /* margin-top: 60px; */
-    margin-bottom: 20px;
-    width: 100%; /* Ensure it takes available width */
-    max-width: 1200px; /* Optional: Limit max width */
-    box-sizing: border-box;
+    align-items: flex-start;
+    width: 100vw;
+    min-height: 100vh;
 }
 
-/* Keep all other styles the same... */
 .game-area {
     display: flex;
     flex-direction: column;
-    align-items: center; /* This should still center block elements horizontally */
-    gap: 10px;
+    align-items: center;
 }
 
 #mainCanvas {
-    border: 1px solid #444;
-    background-color: #282828;
-    max-width: 100%;
-    /* Add this line to treat the canvas as a block element */
+    border: 2px solid red;
+    width: 700px;
+    height: 500px;
     display: block;
-    /* You might optionally need margin: 0 auto; if align-items doesn't center it anymore,
-       but try without it first */
-    /* margin: 0 auto; */
 }
 
 #timer {
@@ -278,4 +266,39 @@ body {
     color: #ff5733; /* Warning color */
     font-weight: bold;
     min-height: 1.2em;
+}
+
+.main-layout {
+    display: flex;
+    justify-content: center; /* Center the main content horizontally */
+    align-items: flex-start;  /* Align items to the top */
+    min-height: 100vh;
+    width: 100vw;
+    box-sizing: border-box;
+}
+
+.center-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center canvas and controls horizontally */
+    margin-top: 40px;    /* Adjust as needed for spacing from top */
+}
+
+#betting-controls {
+    margin-top: 40px; /* Space between canvas and controls */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#sidePanel {
+    margin-left: 60px; /* Space between mainCanvas and sidePanel */
+    align-self: flex-start; /* Align to top of mainCanvas */
+    /* Optional: set a max-width or width */
+}
+
+.game-area, .main-container, .center-column {
+  border: 1px dashed lime;
+  min-height: 0 !important;
+  overflow: visible !important;
 }
