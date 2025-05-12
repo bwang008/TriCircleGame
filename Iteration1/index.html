@@ -12,8 +12,7 @@
 <body>
     <div class="top-bar">
         <div id="bankrollDisplay" class="bankroll">Bankroll: $1000.00</div>
-        <div id="countdownTimer" class="digital-clock">10.000</div>
-    </div>
+        <div id="countdownTimer" class="digital-clock">05.000</div> </div>
 
     <div class="main-container">
         <div class="main-content">
@@ -42,7 +41,9 @@
                 <button id="betOutButton" class="bet-option-button" data-bet-type="out">Bet Center Out (1.33x)</button>
             </div>
 
-            <button id="startButton">Start Simulation</button>
+            <div class="start-controls">
+                <button id="startButton">Start Simulation</button>
+                <button id="simulate10xButton">Simulate 10x</button> </div>
 
             <div id="resultDisplay">Result: ---</div>
             <div id="payoutMessage" class="payout-message"></div>
@@ -54,7 +55,7 @@
             <h2>Zoom View</h2>
             <div class="zoom-view-container">
                  <canvas id="zoomCanvas" width="250" height="250"></canvas>
-                 </div>
+            </div>
 
             <h2>History</h2>
             <div class="history-table-container">

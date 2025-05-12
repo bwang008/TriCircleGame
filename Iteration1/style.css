@@ -1,18 +1,18 @@
 html, body {
-    height: 100%; /* Ensure body can potentially fill height */
+    height: 100%;
     margin: 0;
-    overflow-x: hidden; /* Prevent horizontal scroll */
+    overflow-x: hidden;
 }
 
 body {
     font-family: 'Inter', sans-serif;
     display: flex;
-    flex-direction: column; /* Stack top-bar above main-container */
+    flex-direction: column;
     align-items: center;
     background-color: #1e2127;
     color: #e0e0e0;
     line-height: 1.5;
-    padding-top: 65px; /* Space for fixed top bar */
+    padding-top: 65px;
     box-sizing: border-box;
 }
 
@@ -21,12 +21,12 @@ body {
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    padding: 0 20px; /* More padding */
+    padding: 0 20px;
     position: fixed;
     top: 0;
     left: 0;
-    right: 0; /* Ensure full width */
-    background-color: #1a1f25; /* Slightly different background */
+    right: 0;
+    background-color: #1a1f25;
     z-index: 1000;
     height: 55px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.3);
@@ -53,13 +53,13 @@ body {
 
 .main-container {
     display: flex;
-    flex-direction: row; /* Place main content and side panel side-by-side */
-    justify-content: center; /* Center the content horizontally */
-    align-items: flex-start; /* Align items to the top */
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-start;
     width: 100%;
-    max-width: 1200px; /* Adjust max-width as needed */
-    padding: 15px; /* Padding around the main content area */
-    gap: 20px; /* Space between main content and side panel */
+    max-width: 1200px;
+    padding: 15px;
+    gap: 20px;
     box-sizing: border-box;
 }
 
@@ -67,33 +67,24 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    flex-grow: 1; /* Allow main content to take available space */
-    max-width: 550px; /* Limit width of the main simulation area */
+    flex-grow: 1;
+    max-width: 550px;
 }
 
 .side-panel {
-    width: 300px; /* Fixed width for the side panel */
-    flex-shrink: 0; /* Prevent side panel from shrinking */
+    width: 300px;
+    flex-shrink: 0;
     background-color: #282c34;
     padding: 15px;
     border-radius: 8px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    align-self: stretch; /* Make panel stretch to match height if needed */
+    align-self: stretch;
 }
 
-/* Adjustments for smaller screens */
 @media (max-width: 900px) {
-    .main-container {
-        flex-direction: column; /* Stack vertically */
-        align-items: center; /* Center items when stacked */
-    }
-    .side-panel {
-        width: 100%; /* Full width when stacked */
-        max-width: 550px; /* Match max-width of main content */
-        margin-top: 20px;
-    }
+    .main-container { flex-direction: column; align-items: center; }
+    .side-panel { width: 100%; max-width: 550px; margin-top: 20px; }
 }
-
 
 h1 {
     color: #ffffff;
@@ -110,8 +101,7 @@ h1 {
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
     margin-bottom: 15px;
     padding: 10px;
-    /* Removed max-width, handled by main-content */
-    width: 100%; /* Take full width of parent */
+    width: 100%;
     box-sizing: border-box;
 }
 
@@ -133,41 +123,24 @@ h1 {
     background-color: #2c313a;
     border-radius: 8px;
     width: 100%;
-    /* Removed max-width, handled by main-content */
     box-sizing: border-box;
 }
 
-.chips-container {
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-    flex-wrap: wrap;
-}
-
+.chips-container { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
 .chip {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    border: 2px solid #4f545c;
-    color: #ffffff;
-    font-size: 14px;
-    font-weight: bold;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    width: 50px; height: 50px; border-radius: 50%; border: 2px solid #4f545c;
+    color: #ffffff; font-size: 14px; font-weight: bold; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
     transition: transform 0.1s ease, box-shadow 0.2s ease;
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 .chip:hover:not(:disabled) { transform: scale(1.05); box-shadow: 0 3px 6px rgba(0,0,0,0.3); }
 .chip:active:not(:disabled) { transform: scale(0.98); }
-
 .chip[data-value="1"] { background-color: #adb5bd; border-color: #6c757d;}
 .chip[data-value="5"] { background-color: #dc3545; border-color: #a71d2a;}
 .chip[data-value="10"] { background-color: #007bff; border-color: #0056b3;}
 .chip[data-value="25"] { background-color: #28a745; border-color: #19692c;}
 .chip[data-value="100"] { background-color: #343a40; border-color: #1d2124; color: #fff;}
-
 .chip:disabled {
     opacity: 0.5; cursor: not-allowed;
     background-image: repeating-linear-gradient( 45deg, transparent, transparent 4px, rgba(0,0,0,0.1) 4px, rgba(0,0,0,0.1) 8px );
@@ -199,14 +172,40 @@ h1 {
 }
 .bet-option-button:disabled { background-color: #3a3f47; color: #888c92; border-color: #4a5058; cursor: not-allowed; box-shadow: none; }
 
-button#startButton {
-    background-color: #17a2b8; color: #ffffff; border: none;
-    padding: 10px 22px; font-size: 15px; font-weight: 600; border-radius: 6px;
+/* Container for Start buttons */
+.start-controls {
+    display: flex;
+    justify-content: center;
+    gap: 15px; /* Space between buttons */
+    margin-bottom: 10px;
+    width: 100%; /* Ensure container takes width */
+}
+
+button#startButton, button#simulate10xButton { /* Style both buttons */
+    color: #ffffff; border: none;
+    padding: 10px 20px; /* Adjusted padding */
+    font-size: 15px; font-weight: 600; border-radius: 6px;
     cursor: pointer; transition: background-color 0.2s ease-in-out, transform 0.1s ease;
-    margin-bottom: 10px; box-shadow: 0 3px 8px rgba(23, 162, 184, 0.2);
+    flex-grow: 1; /* Allow buttons to grow */
+    max-width: 200px; /* Limit max width */
+}
+
+button#startButton {
+    background-color: #17a2b8; /* Teal */
+    box-shadow: 0 3px 8px rgba(23, 162, 184, 0.2);
 }
 button#startButton:hover:not(:disabled) { background-color: #117a8b; transform: translateY(-1px); }
-button#startButton:disabled { background-color: #4a5058; color: #888c92; cursor: not-allowed; box-shadow: none; }
+
+button#simulate10xButton {
+    background-color: #fd7e14; /* Orange */
+    box-shadow: 0 3px 8px rgba(253, 126, 20, 0.2);
+}
+button#simulate10xButton:hover:not(:disabled) { background-color: #e36700; transform: translateY(-1px); }
+
+
+button#startButton:disabled, button#simulate10xButton:disabled {
+    background-color: #4a5058; color: #888c92; cursor: not-allowed; box-shadow: none; transform: none;
+}
 
 #resultDisplay {
     font-size: 1.2em; font-weight: 600; padding: 8px 15px; border-radius: 6px;
@@ -224,6 +223,8 @@ button#startButton:disabled { background-color: #4a5058; color: #888c92; cursor:
 .payout-message.win { color: #28a745; }
 .payout-message.lose { color: #dc3545; }
 .payout-message.no-bet { color: #adb5bd; }
+.payout-message.info { color: #17a2b8; } /* Info color for multi-run status */
+
 
 .reset-button {
     background-color: #6c757d; color: #ffffff; border: none;
@@ -235,69 +236,24 @@ button#startButton:disabled { background-color: #4a5058; color: #888c92; cursor:
 
 /* Side Panel Specific Styles */
 .side-panel h2 {
-    text-align: center;
-    color: #e0e0e0;
-    margin-top: 0;
-    margin-bottom: 10px;
-    font-size: 1.3em;
-    border-bottom: 1px solid #4a5058;
-    padding-bottom: 5px;
+    text-align: center; color: #e0e0e0; margin-top: 0; margin-bottom: 10px;
+    font-size: 1.3em; border-bottom: 1px solid #4a5058; padding-bottom: 5px;
 }
-
 .zoom-view-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 20px;
-    background-color: #1e2127; /* Darker background for zoom canvas */
-    border: 1px solid #4a5058;
-    border-radius: 6px;
-    padding: 5px;
-    height: 260px; /* Fixed height */
+    display: flex; justify-content: center; align-items: center;
+    margin-bottom: 20px; background-color: #1e2127; border: 1px solid #4a5058;
+    border-radius: 6px; padding: 5px; height: 260px;
 }
-
-#zoomCanvas {
-    display: block;
-    background-color: #1e2127; /* Match container */
-    border-radius: 4px;
-}
-
+#zoomCanvas { display: block; background-color: #1e2127; border-radius: 4px; }
 .history-table-container {
-    max-height: 300px; /* Limit height and make scrollable */
-    overflow-y: auto;
-    border: 1px solid #4a5058;
-    border-radius: 6px;
-    background-color: #1e2127; /* Darker background for table */
+    max-height: 300px; overflow-y: auto; border: 1px solid #4a5058;
+    border-radius: 6px; background-color: #1e2127;
 }
-
-#historyTable {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.9em;
-}
-
-#historyTable th, #historyTable td {
-    border: 1px solid #4a5058;
-    padding: 6px 8px;
-    text-align: center;
-}
-
-#historyTable th {
-    background-color: #3a3f47;
-    color: #e0e0e0;
-    position: sticky; /* Make header sticky */
-    top: 0;
-    z-index: 1;
-}
-
-#historyTable tbody tr:nth-child(even) {
-    background-color: #2c313a;
-}
-
-#historyTable tbody tr:hover {
-    background-color: #3a3f47;
-}
-
+#historyTable { width: 100%; border-collapse: collapse; font-size: 0.9em; }
+#historyTable th, #historyTable td { border: 1px solid #4a5058; padding: 6px 8px; text-align: center; }
+#historyTable th { background-color: #3a3f47; color: #e0e0e0; position: sticky; top: 0; z-index: 1; }
+#historyTable tbody tr:nth-child(even) { background-color: #2c313a; }
+#historyTable tbody tr:hover { background-color: #3a3f47; }
 #historyTable td.win { color: #28a745; font-weight: bold; }
 #historyTable td.lose { color: #dc3545; font-weight: bold; }
 #historyTable td.no-bet { color: #adb5bd; }
