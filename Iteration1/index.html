@@ -10,13 +10,40 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="countdownTimer" class="digital-clock">10.000</div>
+    <div class="top-bar">
+        <div id="bankrollDisplay" class="bankroll">Bankroll: $1000.00</div>
+        <div id="countdownTimer" class="digital-clock">10.000</div>
+    </div>
+
     <h1>Circle Triangle Center Probability</h1>
+
+    <div class="betting-controls">
+        <button id="betInButton" class="bet-option-button" data-bet-type="in">Bet Center In (4.00x)</button>
+        <button id="betOutButton" class="bet-option-button" data-bet-type="out">Bet Center Out (1.33x)</button>
+    </div>
+
     <div class="simulation-container">
         <canvas id="simulationCanvas" width="500" height="500"></canvas>
     </div>
+
+    <div class="betting-area">
+        <div class="chips-container">
+            <button class="chip" data-value="1">$1</button>
+            <button class="chip" data-value="5">$5</button>
+            <button class="chip" data-value="10">$10</button>
+            <button class="chip" data-value="25">$25</button>
+            <button class="chip" data-value="100">$100</button>
+        </div>
+        <div class="current-bet-section">
+            <div id="currentBetDisplay" class="current-bet">Current Bet: $0.00</div>
+            <button id="clearBetButton" class="clear-bet-button">Clear Bet</button>
+        </div>
+    </div>
+
     <button id="startButton">Start Simulation</button>
     <div id="resultDisplay">Result: ---</div>
+    <div id="payoutMessage" class="payout-message"></div>
+
 
     <script src="script.js"></script>
 </body>
