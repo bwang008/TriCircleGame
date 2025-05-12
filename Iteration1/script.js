@@ -28,8 +28,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const COUNTDOWN_DURATION = 5000; // 5 seconds
 
     // --- Betting Constants ---
-    const ODDS_IN = 4.0;
-    const ODDS_OUT = 4.0 / 3.0;
+    const ODDS_IN = 3.75;
+    const ODDS_OUT = 1.25;
     const CHIP_VALUES = [1, 5, 10, 25, 100];
     const STARTING_BANKROLL = 1000.00;
 
@@ -161,8 +161,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function drawZoomView(points) {
-        clearZoomCanvas(); // Clear placeholder
-        if (!points || points.length < 3) return;
+        // Only show placeholder if not drawing triangle
+        if (!points || points.length < 3) { clearZoomCanvas(); return; }
+
+        // Remove placeholder text when drawing actual content
+        zoomCtx.clearRect(0, 0, zoomCanvas.width, zoomCanvas.height);
+        zoomCtx.fillStyle = '#1e2127';
+        zoomCtx.fillRect(0, 0, zoomCanvas.width, zoomCanvas.height);
 
         const center = { x: simCenterX, y: simCenterY };
         let minDistSq = Infinity;
@@ -195,6 +200,7 @@ document.addEventListener('DOMContentLoaded', () => {
         zoomCtx.scale(scale, scale);
         zoomCtx.translate(-center.x, -center.y);
 
+        // Draw closest line
         zoomCtx.beginPath();
         zoomCtx.moveTo(closestLine.p1.x, closestLine.p1.y);
         zoomCtx.lineTo(closestLine.p2.x, closestLine.p2.y);
@@ -202,11 +208,35 @@ document.addEventListener('DOMContentLoaded', () => {
         zoomCtx.lineWidth = 2 / scale;
         zoomCtx.stroke();
 
+        // Draw center dot
         zoomCtx.beginPath();
         zoomCtx.arc(center.x, center.y, 3 / scale, 0, 2 * Math.PI);
         zoomCtx.fillStyle = '#e0e0e0';
         zoomCtx.fill();
 
+        // Draw distance indicator (line from center to closest point on line)
+        zoomCtx.beginPath();
+        zoomCtx.moveTo(center.x, center.y);
+        zoomCtx.lineTo(closestPointOnLine.x, closestPointOnLine.y);
+        zoomCtx.strokeStyle = '#00e676';
+        zoomCtx.lineWidth = 1.5 / scale;
+        zoomCtx.setLineDash([6 / scale, 4 / scale]);
+        zoomCtx.stroke();
+        zoomCtx.setLineDash([]);
+
+        // Draw distance label (unit circle: radius = 1)
+        const distUnit = minDist / radius; // since radius is the canvas radius, 1 unit = radius px
+        const midX = (center.x + closestPointOnLine.x) / 2;
+        const midY = (center.y + closestPointOnLine.y) / 2;
+        zoomCtx.save();
+        zoomCtx.font = `${14 / scale}px Inter`;
+        zoomCtx.fillStyle = '#00e676';
+        zoomCtx.textAlign = 'center';
+        zoomCtx.textBaseline = 'bottom';
+        zoomCtx.fillText(`d = ${distUnit.toFixed(3)}`, midX, midY);
+        zoomCtx.restore();
+
+        // Draw IN/OUT labels
         const normX = center.x - closestPointOnLine.x;
         const normY = center.y - closestPointOnLine.y;
         const labelOffsetFactor = 15 / scale;
