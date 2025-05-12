@@ -29,8 +29,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const COUNTDOWN_DURATION = 5000; // 5 seconds
 
     // --- Betting Constants ---
-    const ODDS_IN = 3.75;
-    const ODDS_OUT = 1.25;
+    const ODDS_IN = 3.9;
+    const ODDS_OUT = 1.3;
     const CHIP_VALUES = [1, 5, 10, 25, 100];
     const STARTING_BANKROLL = 1000.00;
 
