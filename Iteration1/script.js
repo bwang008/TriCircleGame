@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const zoomCtx = zoomCanvas.getContext('2d');
     const startButton = document.getElementById('startButton');
     const simulate10xButton = document.getElementById('simulate10xButton');
+    const simulate100xButton = document.getElementById('simulate100xButton');
     const cancelSimulationButton = document.getElementById('cancelSimulationButton');
     const resultDisplay = document.getElementById('resultDisplay');
     const timerElement = document.getElementById('countdownTimer');
@@ -55,6 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let isMultiRunning = false;
     let multiRunRemaining = 0;
     let multiRunCancelRequested = false;
+    let multiRunTarget = 10; // Default for 10x, set to 100 for 100x
 
     // --- Initialization and Setup ---
     function initDots() {
@@ -105,6 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!isMultiRunning || multiRunCancelRequested) {
             startButton.disabled = false;
             simulate10xButton.disabled = false;
+            simulate100xButton.disabled = false;
             cancelSimulationButton.style.display = 'none';
         } else {
             cancelSimulationButton.style.display = 'block';
@@ -161,19 +164,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function drawZoomView(points) {
-        // Only show placeholder if not drawing triangle
         if (!points || points.length < 3) { clearZoomCanvas(); return; }
-
-        // Remove placeholder text when drawing actual content
         zoomCtx.clearRect(0, 0, zoomCanvas.width, zoomCanvas.height);
         zoomCtx.fillStyle = '#1e2127';
         zoomCtx.fillRect(0, 0, zoomCanvas.width, zoomCanvas.height);
-
         const center = { x: simCenterX, y: simCenterY };
         let minDistSq = Infinity;
         let closestLine = null;
         let closestPointOnLine = null;
-
         for (let i = 0; i < 3; i++) {
             const p1 = points[i]; const p2 = points[(i + 1) % 3];
             const lenSq = (p2.x - p1.x)**2 + (p2.y - p1.y)**2;
@@ -186,20 +184,16 @@ document.addEventListener('DOMContentLoaded', () => {
             distSq = (center.x - currentClosestPoint.x)**2 + (center.y - currentClosestPoint.y)**2;
             if (distSq < minDistSq) { minDistSq = distSq; closestLine = { p1, p2 }; closestPointOnLine = currentClosestPoint; }
         }
-
         if (!closestLine || !closestPointOnLine) return;
-
         const minDist = Math.sqrt(minDistSq);
         const baseViewSize = 50;
         const minAllowedDist = 0.5;
         const effectiveDist = Math.max(minDist, minAllowedDist);
         const scale = Math.min(zoomCanvas.width / baseViewSize, zoomCanvas.width / (2 * effectiveDist + 10) );
-
         zoomCtx.save();
         zoomCtx.translate(zoomCanvas.width / 2, zoomCanvas.height / 2);
         zoomCtx.scale(scale, scale);
         zoomCtx.translate(-center.x, -center.y);
-
         // Draw closest line
         zoomCtx.beginPath();
         zoomCtx.moveTo(closestLine.p1.x, closestLine.p1.y);
@@ -207,13 +201,11 @@ document.addEventListener('DOMContentLoaded', () => {
         zoomCtx.strokeStyle = 'rgba(255, 193, 7, 0.9)';
         zoomCtx.lineWidth = 2 / scale;
         zoomCtx.stroke();
-
         // Draw center dot
         zoomCtx.beginPath();
         zoomCtx.arc(center.x, center.y, 3 / scale, 0, 2 * Math.PI);
         zoomCtx.fillStyle = '#e0e0e0';
         zoomCtx.fill();
-
         // Draw distance indicator (line from center to closest point on line)
         zoomCtx.beginPath();
         zoomCtx.moveTo(center.x, center.y);
@@ -223,23 +215,26 @@ document.addEventListener('DOMContentLoaded', () => {
         zoomCtx.setLineDash([6 / scale, 4 / scale]);
         zoomCtx.stroke();
         zoomCtx.setLineDash([]);
-
         // Draw distance label (unit circle: radius = 1)
-        const distUnit = minDist / radius; // since radius is the canvas radius, 1 unit = radius px
+        const distUnit = minDist / radius;
+        // Place the distance label offset perpendicular to the distance line to avoid overlap
         const midX = (center.x + closestPointOnLine.x) / 2;
         const midY = (center.y + closestPointOnLine.y) / 2;
+        const perpAngle = Math.atan2(center.y - closestPointOnLine.y, center.x - closestPointOnLine.x) + Math.PI / 2;
+        const distLabelOffset = 18 / scale;
+        const distLabelX = midX + Math.cos(perpAngle) * distLabelOffset;
+        const distLabelY = midY + Math.sin(perpAngle) * distLabelOffset;
         zoomCtx.save();
         zoomCtx.font = `${14 / scale}px Inter`;
         zoomCtx.fillStyle = '#00e676';
         zoomCtx.textAlign = 'center';
         zoomCtx.textBaseline = 'bottom';
-        zoomCtx.fillText(`d = ${distUnit.toFixed(3)}`, midX, midY);
+        zoomCtx.fillText(`d = ${distUnit.toFixed(3)}`, distLabelX, distLabelY);
         zoomCtx.restore();
-
-        // Draw IN/OUT labels
+        // Draw IN/OUT labels spaced away from the distance label
         const normX = center.x - closestPointOnLine.x;
         const normY = center.y - closestPointOnLine.y;
-        const labelOffsetFactor = 15 / scale;
+        const labelOffsetFactor = 30 / scale; // Increased offset for clarity
         const normLen = Math.sqrt(normX*normX + normY*normY);
         const unitNormX = normLen > 1e-6 ? normX / normLen : 0;
         const unitNormY = normLen > 1e-6 ? normY / normLen : 0;
@@ -247,14 +242,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const labelPosY = closestPointOnLine.y + unitNormY * labelOffsetFactor;
         const labelOutPosX = closestPointOnLine.x - unitNormX * labelOffsetFactor;
         const labelOutPosY = closestPointOnLine.y - unitNormY * labelOffsetFactor;
+        // Further offset the IN/OUT labels perpendicular to the line to avoid the distance label
+        const inoutPerpOffset = 18 / scale;
+        const inoutPerpX = Math.cos(perpAngle) * inoutPerpOffset;
+        const inoutPerpY = Math.sin(perpAngle) * inoutPerpOffset;
         zoomCtx.font = `${12 / scale}px Inter`;
         zoomCtx.textAlign = 'center';
         zoomCtx.textBaseline = 'middle';
         const resultIsTrue = isCenterInTriangleLogic();
         zoomCtx.fillStyle = resultIsTrue ? '#28a745' : '#dc3545';
-        zoomCtx.fillText(resultIsTrue ? 'IN' : 'OUT', labelPosX, labelPosY);
+        zoomCtx.fillText(resultIsTrue ? 'IN' : 'OUT', labelPosX + inoutPerpX, labelPosY + inoutPerpY);
         zoomCtx.fillStyle = !resultIsTrue ? '#28a745' : '#dc3545';
-        zoomCtx.fillText(!resultIsTrue ? 'IN' : 'OUT', labelOutPosX, labelOutPosY);
+        zoomCtx.fillText(!resultIsTrue ? 'IN' : 'OUT', labelOutPosX + inoutPerpX, labelOutPosY + inoutPerpY);
         zoomCtx.restore();
     }
 
@@ -321,7 +320,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const disableControls = bettingLocked || simulationRunning || isMultiRunning;
         chipElements.forEach(chip => {
             const chipValue = parseFloat(chip.dataset.value);
-            // Disable chips if controls locked OR bankroll cannot cover the *potential* next bet increase
             chip.disabled = disableControls || bankroll < (currentBetAmount + chipValue);
         });
         clearBetButton.disabled = disableControls || currentBetAmount === 0;
@@ -329,7 +327,14 @@ document.addEventListener('DOMContentLoaded', () => {
         betOutButton.disabled = disableControls;
         startButton.disabled = simulationRunning || isMultiRunning;
         simulate10xButton.disabled = simulationRunning || isMultiRunning;
+        simulate100xButton.disabled = simulationRunning || isMultiRunning;
         cancelSimulationButton.style.display = isMultiRunning ? 'block' : 'none';
+        // Update cancel button text with remaining spins if running
+        if (isMultiRunning && multiRunRemaining > 0) {
+            cancelSimulationButton.textContent = `Cancel Simulation (${multiRunRemaining} left)`;
+        } else {
+            cancelSimulationButton.textContent = 'Cancel Simulation';
+        }
     }
 
     // --- Betting Logic Functions ---
@@ -422,29 +427,27 @@ document.addEventListener('DOMContentLoaded', () => {
         if (timeLeft > 0) { timeLeft = 0; }
         updateTimerDisplay();
 
-        clearCanvas(); drawCircle(); dots.forEach(drawDot); drawTriangle(); // Ensure final draw
+        clearCanvas(); drawCircle(); dots.forEach(drawDot); drawTriangle();
 
-        processPayout(); // Process bets using activeBetAmount
-        checkIfCenterIsInTriangle(); // Update result display
-        updateHistoryTable(); // Update history
+        processPayout();
+        checkIfCenterIsInTriangle();
+        updateHistoryTable();
 
-        // Check multi-run status OR if cancel was requested
         if (isMultiRunning && multiRunRemaining > 0 && !multiRunCancelRequested) {
-             // Delay before starting next run
-             setTimeout(startSingleSimulationCycle, 1000); // 1 second delay
+             setTimeout(startSingleSimulationCycle, 1000);
         } else {
-            // End of single run, multi-run, or cancelled multi-run
             if (isMultiRunning) {
-                 payoutMessageDisplay.textContent = multiRunCancelRequested ? `Multi-run cancelled. ${payoutMessageDisplay.textContent}` : `Simulate 10x complete. ${payoutMessageDisplay.textContent}`;
+                 payoutMessageDisplay.textContent = multiRunCancelRequested ? `Multi-run cancelled. ${payoutMessageDisplay.textContent}` : `Simulate ${multiRunTarget}x complete. ${payoutMessageDisplay.textContent}`;
                  isMultiRunning = false;
                  multiRunRemaining = 0;
-                 multiRunCancelRequested = false; // Reset cancel flag
+                 multiRunCancelRequested = false;
             }
-            bettingLocked = false; // Unlock betting
-            updateChipStates(); // Re-enable controls
+            bettingLocked = false;
+            updateChipStates();
             startButton.disabled = false;
             simulate10xButton.disabled = false;
-            cancelSimulationButton.style.display = 'none'; // Hide cancel button
+            simulate100xButton.disabled = false;
+            cancelSimulationButton.style.display = 'none';
         }
     }
 
@@ -574,40 +577,37 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Multi-run Logic ---
     function startSingleSimulationCycle() {
-        // Bankroll check for the *next* bet
         if (bankroll < currentBetAmount && currentBetAmount > 0) {
             payoutMessageDisplay.textContent = `Multi-run stopped. Insufficient bankroll ($${bankroll.toFixed(2)}) for next bet ($${currentBetAmount.toFixed(2)}).`;
             payoutMessageDisplay.className = 'payout-message lose';
             isMultiRunning = false; multiRunRemaining = 0; multiRunCancelRequested = false;
-            startButton.disabled = false; simulate10xButton.disabled = false; cancelSimulationButton.style.display = 'none';
+            startButton.disabled = false; simulate10xButton.disabled = false; simulate100xButton.disabled = false; cancelSimulationButton.style.display = 'none';
             updateChipStates(); return;
         }
-        // Cancel check
         if (!isMultiRunning || multiRunRemaining <= 0 || multiRunCancelRequested) {
             isMultiRunning = false; multiRunRemaining = 0; multiRunCancelRequested = false;
-            updateChipStates(); // Re-enable controls
-            startButton.disabled = false; simulate10xButton.disabled = false; cancelSimulationButton.style.display = 'none';
+            updateChipStates();
+            startButton.disabled = false; simulate10xButton.disabled = false; simulate100xButton.disabled = false; cancelSimulationButton.style.display = 'none';
             if (multiRunCancelRequested) {
                  payoutMessageDisplay.textContent = `Multi-run cancelled. ${payoutMessageDisplay.textContent}`;
-            } else if (multiRunRemaining <=0 && !multiRunCancelRequested) { // Ensure completion message shows if not cancelled
-                 payoutMessageDisplay.textContent = `Simulate 10x complete. ${payoutMessageDisplay.textContent}`;
+            } else if (multiRunRemaining <=0 && !multiRunCancelRequested) {
+                 payoutMessageDisplay.textContent = `Simulate ${multiRunTarget}x complete. ${payoutMessageDisplay.textContent}`;
             }
             return;
         }
 
         multiRunRemaining--;
-        payoutMessageDisplay.textContent = `Running simulation ${10 - multiRunRemaining} of 10...`;
+        payoutMessageDisplay.textContent = `Running simulation ${multiRunTarget - multiRunRemaining} of ${multiRunTarget}...`;
         payoutMessageDisplay.className = 'payout-message info';
+        updateChipStates();
 
-        // --- Deduct Bet at the START of the cycle ---
         if (currentBetAmount > 0) {
-            activeBetAmount = currentBetAmount; // Set the active bet for this round
-            bankroll -= activeBetAmount; // Deduct from bankroll
+            activeBetAmount = currentBetAmount;
+            bankroll -= activeBetAmount;
             updateBankrollDisplay();
         } else {
-            activeBetAmount = 0; // Ensure active bet is 0 if no current bet
+            activeBetAmount = 0;
         }
-        // ---
 
         if (animationFrameId) cancelAnimationFrame(animationFrameId);
         clearTimeout(stopSchedulingTimeout); clearInterval(countdownInterval);
@@ -629,7 +629,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             if (simulationRunning || isMultiRunning) return;
 
-            startButton.disabled = true; simulate10xButton.disabled = true;
+            startButton.disabled = true; simulate10xButton.disabled = true; simulate100xButton.disabled = true;
             simulationRunning = true;
             updateChipStates();
 
@@ -666,13 +666,39 @@ document.addEventListener('DOMContentLoaded', () => {
              if (simulationRunning || isMultiRunning) return;
 
              isMultiRunning = true;
+             multiRunTarget = 10;
              multiRunRemaining = 10;
              multiRunCancelRequested = false;
-             startButton.disabled = true; simulate10xButton.disabled = true;
+             startButton.disabled = true; simulate10xButton.disabled = true; simulate100xButton.disabled = true;
              cancelSimulationButton.style.display = 'block';
              cancelSimulationButton.disabled = false;
              updateChipStates();
+             startSingleSimulationCycle();
+        });
 
+        simulate100xButton.addEventListener('click', () => {
+             if (currentBetAmount > 0 && !selectedBetType) {
+                 payoutMessageDisplay.textContent = "Please select 'Bet Center In' or 'Bet Center Out'.";
+                 payoutMessageDisplay.className = 'payout-message lose'; return;
+             }
+             if (currentBetAmount === 0) {
+                  payoutMessageDisplay.textContent = "Please place a bet first.";
+                  payoutMessageDisplay.className = 'payout-message lose'; return;
+             }
+             if (bankroll < currentBetAmount) {
+                 payoutMessageDisplay.textContent = `Insufficient bankroll ($${bankroll.toFixed(2)}) for bet ($${currentBetAmount.toFixed(2)}).`;
+                 payoutMessageDisplay.className = 'payout-message lose'; return;
+             }
+             if (simulationRunning || isMultiRunning) return;
+
+             isMultiRunning = true;
+             multiRunTarget = 100;
+             multiRunRemaining = 100;
+             multiRunCancelRequested = false;
+             startButton.disabled = true; simulate10xButton.disabled = true; simulate100xButton.disabled = true;
+             cancelSimulationButton.style.display = 'block';
+             cancelSimulationButton.disabled = false;
+             updateChipStates();
              startSingleSimulationCycle();
         });
 

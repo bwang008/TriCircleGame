@@ -202,6 +202,31 @@ button#simulate10xButton {
 }
 button#simulate10xButton:hover:not(:disabled) { background-color: #e36700; transform: translateY(-1px); }
 
+button#simulate100xButton {
+    background-color: #6f42c1; /* Purple */
+    color: #ffffff;
+    border: none;
+    padding: 10px 20px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out, transform 0.1s ease;
+    flex-grow: 1;
+    max-width: 200px;
+    box-shadow: 0 3px 8px rgba(111, 66, 193, 0.2);
+}
+button#simulate100xButton:hover:not(:disabled) {
+    background-color: #563d7c;
+    transform: translateY(-1px);
+}
+button#simulate100xButton:disabled {
+    background-color: #4a5058;
+    color: #888c92;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+}
 
 button#startButton:disabled, button#simulate10xButton:disabled {
     background-color: #4a5058; color: #888c92; cursor: not-allowed; box-shadow: none; transform: none;
