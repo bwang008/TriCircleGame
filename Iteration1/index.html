@@ -17,11 +17,6 @@
 
     <h1>Circle Triangle Center Probability</h1>
 
-    <div class="betting-controls">
-        <button id="betInButton" class="bet-option-button" data-bet-type="in">Bet Center In (4.00x)</button>
-        <button id="betOutButton" class="bet-option-button" data-bet-type="out">Bet Center Out (1.33x)</button>
-    </div>
-
     <div class="simulation-container">
         <canvas id="simulationCanvas" width="500" height="500"></canvas>
     </div>
@@ -40,9 +35,17 @@
         </div>
     </div>
 
+    <div class="betting-controls">
+        <button id="betInButton" class="bet-option-button" data-bet-type="in">Bet Center In (4.00x)</button>
+        <button id="betOutButton" class="bet-option-button" data-bet-type="out">Bet Center Out (1.33x)</button>
+    </div>
+
     <button id="startButton">Start Simulation</button>
+
     <div id="resultDisplay">Result: ---</div>
     <div id="payoutMessage" class="payout-message"></div>
+
+    <button id="resetBankrollButton" class="reset-button">Reset Bankroll</button>
 
 
     <script src="script.js"></script>
