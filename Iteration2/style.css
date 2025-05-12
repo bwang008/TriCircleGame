@@ -1,0 +1,266 @@
+body {
+    background-color: #1a1a1a; /* Dark background */
+    color: #e0e0e0;           /* Light text */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column; /* Stack bankroll, main, betting */
+    align-items: center;
+    min-height: 100vh;
+    position: relative; /* Needed for absolute positioning of bankroll */
+}
+
+#bankrollDisplay {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    font-size: 1.4em;
+    font-weight: bold;
+    color: #ffd700; /* Gold color */
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+.main-container {
+    display: flex;
+    gap: 30px; /* Space between game area and side panel */
+    align-items: flex-start;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 60px; /* Ensure space below bankroll */
+    margin-bottom: 20px;
+}
+
+.game-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px; /* Reduced gap */
+}
+
+#mainCanvas {
+    border: 1px solid #444;
+    background-color: #282828;
+}
+
+#timer {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #cccccc;
+    min-height: 1.5em;
+}
+
+#result {
+    font-size: 1.5em;
+    font-weight: bold;
+    padding: 5px 15px;
+    border-radius: 5px;
+    min-height: 1.8em;
+    text-align: center;
+}
+
+#payoutInfo {
+    font-size: 1.1em;
+    color: #4CAF50; /* Green for wins initially */
+    min-height: 1.3em;
+    font-weight: bold;
+}
+
+.result-in {
+    background-color: #006400; /* Dark Green */
+    color: #e0e0e0;
+}
+
+.result-out {
+    background-color: #8B0000; /* Dark Red */
+    color: #e0e0e0;
+}
+
+#sidePanel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid #444;
+    padding: 15px;
+    background-color: #282828;
+    border-radius: 8px;
+    min-height: 250px; /* Ensure consistent height */
+}
+
+#zoomLabel {
+    font-weight: bold;
+    color: #cccccc;
+}
+
+#zoomCanvas {
+    border: 1px solid #555;
+    background-color: #333;
+}
+#zoomInfo {
+    font-size: 0.9em;
+    color: #b0b0b0;
+    text-align: center;
+    min-height: 2.5em; /* Reserve space */
+}
+
+/* --- Betting Controls --- */
+.betting-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #282828;
+    border-radius: 8px;
+    border: 1px solid #444;
+    min-width: 500px;
+}
+
+.bet-selection {
+    display: flex;
+    gap: 15px;
+}
+
+.bet-button {
+    padding: 10px 20px;
+    font-size: 1.1em;
+    font-weight: bold;
+    border: 2px solid #555;
+    background-color: #444;
+    color: #e0e0e0;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.bet-button:hover:not(:disabled) {
+    background-color: #555;
+}
+
+.bet-button.selected {
+    background-color: #006400; /* Dark Green for selected 'IN' */
+    border-color: #33ff57;   /* Bright Green border */
+    color: white;
+}
+
+#betOutButton.selected {
+    background-color: #8B0000; /* Dark Red for selected 'OUT' */
+    border-color: #ff5733;   /* Orange-Red border */
+}
+
+
+.bet-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+
+.bet-area {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.chips-container {
+    display: flex;
+    gap: 10px;
+}
+
+.chip {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    font-size: 1em;
+    cursor: pointer;
+    border: 3px solid #333;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+    transition: transform 0.1s, box-shadow 0.1s, opacity 0.3s;
+    color: black; /* Default for most chips */
+}
+
+.chip:hover:not(.disabled) {
+    transform: scale(1.1);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+}
+
+.chip[data-value="1"] { background: linear-gradient(135deg, #e0e0e0, #a0a0a0); border-color: #666;}
+.chip[data-value="5"] { background: linear-gradient(135deg, #ff4d4d, #cc0000); border-color: #800000; color: white;}
+.chip[data-value="10"] { background: linear-gradient(135deg, #4da6ff, #0059cc); border-color: #003380; color: white;}
+.chip[data-value="25"] { background: linear-gradient(135deg, #4dff4d, #00cc00); border-color: #008000; color: white;}
+.chip[data-value="100"] { background: linear-gradient(135deg, #666666, #1a1a1a); border-color: #000; color: white;}
+
+.chip span {
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 3px;
+    padding: 1px 4px;
+    font-size: 0.9em;
+    color: #111; /* Text color inside the span */
+}
+/* Adjust span colors for dark chips */
+.chip[data-value="5"] span,
+.chip[data-value="10"] span,
+.chip[data-value="25"] span,
+.chip[data-value="100"] span {
+    background-color: rgba(0, 0, 0, 0.4);
+    color: white;
+}
+
+
+.chip.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none; /* Further ensure no interaction */
+    filter: grayscale(80%);
+}
+
+
+.current-bet-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+#currentBetDisplay {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #ffcc00;
+    background-color: #333;
+    padding: 5px 10px;
+    border-radius: 4px;
+    min-width: 100px; /* Ensure width */
+    text-align: center;
+}
+
+#clearBetButton {
+    padding: 6px 12px;
+    font-size: 0.9em;
+    background-color: #c8a415;
+    color: #111;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#clearBetButton:hover:not(:disabled) {
+    background-color: #e0b841;
+}
+
+#clearBetButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.bet-message {
+    color: #ff5733; /* Warning color */
+    font-weight: bold;
+    min-height: 1.2em;
+}
