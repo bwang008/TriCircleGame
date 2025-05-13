@@ -42,6 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let timeLeft = COUNTDOWN_DURATION;
     let stopSchedulingTimeout;
     let simulationRunning = false;
+    let startTimestamp = null;
 
     // --- Betting State Variables ---
     let bankroll = STARTING_BANKROLL;
@@ -269,56 +270,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-    function scheduleDotStops() {
-        // Clear any previous timeouts
-        clearTimeout(stopSchedulingTimeout);
-        if (dots.length !== 3) return;
-        // Stop first dot at 33.3%
-        setTimeout(() => {
-            if (simulationRunning && !dots[0].isStopped) {
-                dots[0].isStopping = true;
-                dots[0].angleToStopAt = dots[0].angle;
-                setTimeout(() => {
-                    if (simulationRunning && !dots[0].isStopped) {
-                        dots[0].finalAngle = dots[0].angleToStopAt;
-                        dots[0].isStopped = true;
-                        stoppedDotsCount++;
-                        if (stoppedDotsCount === TOTAL_DOTS) finalizeSimulation();
-                    }
-                }, 50);
-            }
-        }, Math.floor(COUNTDOWN_DURATION * 0.333));
-        // Stop second dot at 66.6%
-        setTimeout(() => {
-            if (simulationRunning && !dots[1].isStopped) {
-                dots[1].isStopping = true;
-                dots[1].angleToStopAt = dots[1].angle;
-                setTimeout(() => {
-                    if (simulationRunning && !dots[1].isStopped) {
-                        dots[1].finalAngle = dots[1].angleToStopAt;
-                        dots[1].isStopped = true;
-                        stoppedDotsCount++;
-                        if (stoppedDotsCount === TOTAL_DOTS) finalizeSimulation();
-                    }
-                }, 50);
-            }
-        }, Math.floor(COUNTDOWN_DURATION * 0.666));
-        // Stop third dot at 99.9%
-        setTimeout(() => {
-            if (simulationRunning && !dots[2].isStopped) {
-                dots[2].isStopping = true;
-                dots[2].angleToStopAt = dots[2].angle;
-                setTimeout(() => {
-                    if (simulationRunning && !dots[2].isStopped) {
-                        dots[2].finalAngle = dots[2].angleToStopAt;
-                        dots[2].isStopped = true;
-                        stoppedDotsCount++;
-                        if (stoppedDotsCount === TOTAL_DOTS) finalizeSimulation();
-                    }
-                }, 50);
-            }
-        }, Math.floor(COUNTDOWN_DURATION * 0.999));
-    }
 
     // --- Betting UI Update Functions ---
     function updateBankrollDisplay() { bankrollDisplay.textContent = `Bankroll: $${bankroll.toFixed(2)}`; }
@@ -527,14 +478,35 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     function startCountdown() {
         timeLeft = COUNTDOWN_DURATION;
-        bettingLocked = false; // Ensure unlocked at start
+        bettingLocked = false;
         simulationRunning = true;
-        updateChipStates(); // Disable controls during run
+        updateChipStates();
         updateTimerDisplay();
+
+        startTimestamp = performance.now();
+
+        // Track which dots have been stopped
+        let dotStopThresholds = [
+            COUNTDOWN_DURATION * 0.333,
+            COUNTDOWN_DURATION * 0.666,
+            COUNTDOWN_DURATION * 0.999
+        ];
+        let dotStopped = [false, false, false];
 
         clearInterval(countdownInterval);
         countdownInterval = setInterval(() => {
-            timeLeft -= 10;
+            const now = performance.now();
+            const elapsed = now - startTimestamp;
+            timeLeft = Math.max(0, COUNTDOWN_DURATION - elapsed);
+
+            // Stop dots at the right times
+            for (let i = 0; i < dotStopThresholds.length; i++) {
+                if (!dotStopped[i] && elapsed >= dotStopThresholds[i]) {
+                    stopDot(i);
+                    dotStopped[i] = true;
+                }
+            }
+
             if (timeLeft <= 0) {
                 timeLeft = 0;
                 clearInterval(countdownInterval);
@@ -544,6 +516,21 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             updateTimerDisplay();
         }, 10);
+    }
+
+    function stopDot(index) {
+        if (simulationRunning && !dots[index].isStopped) {
+            dots[index].isStopping = true;
+            dots[index].angleToStopAt = dots[index].angle;
+            setTimeout(() => {
+                if (simulationRunning && !dots[index].isStopped) {
+                    dots[index].finalAngle = dots[index].angleToStopAt;
+                    dots[index].isStopped = true;
+                    stoppedDotsCount++;
+                    if (stoppedDotsCount === TOTAL_DOTS) finalizeSimulation();
+                }
+            }, 50);
+        }
     }
 
     // --- Game Loop ---
@@ -626,7 +613,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (animationFrameId) cancelAnimationFrame(animationFrameId);
         clearTimeout(stopSchedulingTimeout); clearInterval(countdownInterval);
 
-        initDots(); startCountdown(); scheduleDotStops(); gameLoop();
+        initDots(); startCountdown(); gameLoop();
     }
 
 
@@ -661,7 +648,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             // ---
 
-            initDots(); startCountdown(); scheduleDotStops(); gameLoop();
+            initDots(); startCountdown(); gameLoop();
         });
 
         simulate10xButton.addEventListener('click', () => {
