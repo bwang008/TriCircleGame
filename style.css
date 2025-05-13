@@ -15,7 +15,7 @@ body {
     padding-top: 50px;
     box-sizing: border-box;
     min-height: 100vh;
-    height: 100vh;
+    height: auto;
 }
 
 .top-bar {
@@ -64,9 +64,9 @@ body {
     gap: 10px;
     box-sizing: border-box;
     min-height: 0;
-    height: calc(100vh - 45px);
-    max-height: calc(100vh - 45px);
-    overflow: hidden;
+    height: auto;
+    max-height: none;
+    overflow: visible;
 }
 
 .main-content {
@@ -88,7 +88,12 @@ body {
 }
 
 @media (max-width: 900px) {
-    .main-container { flex-direction: column; align-items: center; }
+    .main-container { 
+        flex-direction: column; 
+        align-items: center; 
+        height: auto;
+        max-height: none;
+    }
     .side-panel { width: 100%; max-width: 550px; margin-top: 20px; }
 }
 
