@@ -13,6 +13,8 @@ Place your bet and see if your prediction pays off!
 
 ## 🎯 How to Play
 
+Hosted at: https://bwang008.github.io/TriCircleGame/
+
 1. **Place Your Bet:**  
    - Choose your bet amount using the chips.
    - Select either **Bet Center In** or **Bet Center Out**.
