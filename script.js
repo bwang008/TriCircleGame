@@ -23,8 +23,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Canvas and Simulation Constants ---
     const simCenterX = canvas.width / 2;
     const simCenterY = canvas.height / 2;
-    const radius = canvas.width / 2 - 30;
-    const dotRadius = 5;
+    const radius = canvas.width / 2 - 18;
+    const dotRadius = 4;
     const TOTAL_DOTS = 3;
     const COUNTDOWN_DURATION = 5000; // 5 seconds
 
@@ -273,7 +273,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Clear any previous timeouts
         clearTimeout(stopSchedulingTimeout);
         if (dots.length !== 3) return;
-        // Stop first dot at 33%
+        // Stop first dot at 33.3%
         setTimeout(() => {
             if (simulationRunning && !dots[0].isStopped) {
                 dots[0].isStopping = true;
@@ -288,7 +288,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, 50);
             }
         }, Math.floor(COUNTDOWN_DURATION * 0.333));
-        // Stop second dot at 66%
+        // Stop second dot at 66.6%
         setTimeout(() => {
             if (simulationRunning && !dots[1].isStopped) {
                 dots[1].isStopping = true;
@@ -411,7 +411,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- History Table Function ---
     function updateHistoryTable() {
         historyTableBody.innerHTML = '';
-        const displayHistory = history.slice(-10).reverse();
+        const displayHistory = history.slice(-100).reverse();
         displayHistory.forEach(entry => {
             const row = historyTableBody.insertRow();
             row.insertCell().textContent = entry.round;

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Monte Carlo Center-in-Triangle Test</title>
+</head>
+<body>
+  <h1>Monte Carlo Simulation</h1>
+  <pre id="output"></pre>
+  <script>
+    function isCenterInTriangle(angles) {
+      angles.sort((a, b) => a - b);
+      const arc1 = angles[1] - angles[0];
+      const arc2 = angles[2] - angles[1];
+      const arc3 = (2 * Math.PI) - (angles[2] - angles[0]);
+      const epsilon = 1e-9;
+      return (
+        arc1 < Math.PI - epsilon &&
+        arc2 < Math.PI - epsilon &&
+        arc3 < Math.PI - epsilon &&
+        arc1 > epsilon && arc2 > epsilon && arc3 > epsilon
+      );
+    }
+
+    let inCount = 0, outCount = 0, N = 2000000;
+    for (let i = 0; i < N; i++) {
+      const angles = [
+        Math.random() * 2 * Math.PI,
+        Math.random() * 2 * Math.PI,
+        Math.random() * 2 * Math.PI
+      ];
+      if (isCenterInTriangle(angles)) inCount++;
+      else outCount++;
+    }
+    document.getElementById('output').textContent =
+      `IN: ${(inCount/N*100).toFixed(2)}% (${inCount})\n` +
+      `OUT: ${(outCount/N*100).toFixed(2)}% (${outCount})`;
+  </script>
+</body>
+</html>
