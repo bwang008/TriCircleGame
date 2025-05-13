@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const payoutMessageDisplay = document.getElementById('payoutMessage');
     const resetBankrollButton = document.getElementById('resetBankrollButton');
     const historyTableBody = document.getElementById('historyTable').querySelector('tbody');
+    const speedButtons = document.querySelectorAll('.speed-button');
 
     // --- Canvas and Simulation Constants ---
     const simCenterX = canvas.width / 2;
@@ -26,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const radius = canvas.width / 2 - 18;
     const dotRadius = 4;
     const TOTAL_DOTS = 3;
-    const COUNTDOWN_DURATION = 5000; // 5 seconds
+    const BASE_COUNTDOWN_DURATION = 5000; // 5 seconds base duration
 
     // --- Betting Constants ---
     const ODDS_IN = 3.9;
@@ -39,10 +40,11 @@ document.addEventListener('DOMContentLoaded', () => {
     let animationFrameId;
     let stoppedDotsCount = 0;
     let countdownInterval;
-    let timeLeft = COUNTDOWN_DURATION;
+    let timeLeft = BASE_COUNTDOWN_DURATION;
     let stopSchedulingTimeout;
     let simulationRunning = false;
     let startTimestamp = null;
+    let selectedSpeed = 1; // Default speed multiplier
 
     // --- Betting State Variables ---
     let bankroll = STARTING_BANKROLL;
@@ -65,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
         for (let i = 0; i < TOTAL_DOTS; i++) {
             dots.push({
                 id: i, angle: Math.random() * 2 * Math.PI,
-                speed: (Math.random() * 0.04 + 0.01) * (Math.random() < 0.5 ? 1 : -1),
+                speed: (Math.random() * 0.04 + 0.01) * (Math.random() < 0.5 ? 1 : -1) * selectedSpeed,
                 color: `hsl(${Math.random() * 360}, 80%, 60%)`,
                 isStopped: false, isStopping: false, angleToStopAt: null, finalAngle: null, x: 0, y: 0
             });
@@ -74,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
         resultDisplay.textContent = 'Result: ---';
         resultDisplay.className = 'default';
 
-        timeLeft = COUNTDOWN_DURATION;
+        timeLeft = BASE_COUNTDOWN_DURATION / selectedSpeed;
         updateTimerDisplay();
         resetForNewRound();
     }
@@ -89,10 +91,12 @@ document.addEventListener('DOMContentLoaded', () => {
         isMultiRunning = false;
         multiRunRemaining = 0;
         multiRunCancelRequested = false;
+        selectedSpeed = 1; // Reset speed to default
 
         updateBankrollDisplay();
         updateCurrentBetDisplay();
         updateBetSelectionButtons();
+        updateSpeedButtons();
         updateChipStates();
         clearBetButton.disabled = (currentBetAmount === 0);
         cancelSimulationButton.style.display = 'none';
@@ -115,6 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         updateChipStates();
+        updateSpeedButtons();
         clearBetButton.disabled = bettingLocked || currentBetAmount === 0;
         betInButton.disabled = bettingLocked;
         betOutButton.disabled = bettingLocked;
@@ -409,6 +414,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             bettingLocked = false;
             updateChipStates();
+            updateSpeedButtons();
             startButton.disabled = false;
             simulate10xButton.disabled = false;
             simulate100xButton.disabled = false;
@@ -477,19 +483,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     function startCountdown() {
-        timeLeft = COUNTDOWN_DURATION;
+        timeLeft = BASE_COUNTDOWN_DURATION / selectedSpeed;
         bettingLocked = false;
         simulationRunning = true;
         updateChipStates();
+        updateSpeedButtons();
         updateTimerDisplay();
 
         startTimestamp = performance.now();
 
         // Track which dots have been stopped
         let dotStopThresholds = [
-            COUNTDOWN_DURATION * 0.333,
-            COUNTDOWN_DURATION * 0.666,
-            COUNTDOWN_DURATION * 0.999
+            timeLeft * 0.333,
+            timeLeft * 0.666,
+            timeLeft * 0.999
         ];
         let dotStopped = [false, false, false];
 
@@ -497,7 +504,7 @@ document.addEventListener('DOMContentLoaded', () => {
         countdownInterval = setInterval(() => {
             const now = performance.now();
             const elapsed = now - startTimestamp;
-            timeLeft = Math.max(0, COUNTDOWN_DURATION - elapsed);
+            timeLeft = Math.max(0, (BASE_COUNTDOWN_DURATION / selectedSpeed) - elapsed);
 
             // Stop dots at the right times
             for (let i = 0; i < dotStopThresholds.length; i++) {
@@ -583,11 +590,14 @@ document.addEventListener('DOMContentLoaded', () => {
             payoutMessageDisplay.className = 'payout-message lose';
             isMultiRunning = false; multiRunRemaining = 0; multiRunCancelRequested = false;
             startButton.disabled = false; simulate10xButton.disabled = false; simulate100xButton.disabled = false; cancelSimulationButton.style.display = 'none';
-            updateChipStates(); return;
+            updateChipStates();
+            updateSpeedButtons();
+            return;
         }
         if (!isMultiRunning || multiRunRemaining <= 0 || multiRunCancelRequested) {
             isMultiRunning = false; multiRunRemaining = 0; multiRunCancelRequested = false;
             updateChipStates();
+            updateSpeedButtons();
             startButton.disabled = false; simulate10xButton.disabled = false; simulate100xButton.disabled = false; cancelSimulationButton.style.display = 'none';
             if (multiRunCancelRequested) {
                  payoutMessageDisplay.textContent = `Multi-run cancelled. ${payoutMessageDisplay.textContent}`;
@@ -601,6 +611,7 @@ document.addEventListener('DOMContentLoaded', () => {
         payoutMessageDisplay.textContent = `Running simulation ${multiRunTarget - multiRunRemaining} of ${multiRunTarget}...`;
         payoutMessageDisplay.className = 'payout-message info';
         updateChipStates();
+        updateSpeedButtons();
 
         if (currentBetAmount > 0) {
             activeBetAmount = currentBetAmount;
@@ -616,6 +627,20 @@ document.addEventListener('DOMContentLoaded', () => {
         initDots(); startCountdown(); gameLoop();
     }
 
+    function updateSpeedButtons() {
+        speedButtons.forEach(button => {
+            const speed = parseInt(button.dataset.speed);
+            button.classList.toggle('selected', speed === selectedSpeed);
+            button.disabled = simulationRunning || isMultiRunning;
+        });
+    }
+
+    function handleSpeedSelection(event) {
+        if (simulationRunning || isMultiRunning) return;
+        const newSpeed = parseInt(event.target.dataset.speed);
+        selectedSpeed = newSpeed;
+        updateSpeedButtons();
+    }
 
     // --- Event Listeners ---
     function setupEventListeners() {
@@ -714,6 +739,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         clearBetButton.addEventListener('click', handleClearBet);
         resetBankrollButton.addEventListener('click', handleResetBankroll);
+
+        // Add speed button event listeners
+        speedButtons.forEach(button => {
+            button.addEventListener('click', handleSpeedSelection);
+        });
     }
 
     // --- Initial Page Load ---

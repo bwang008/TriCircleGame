@@ -138,6 +138,63 @@ h1 {
     box-sizing: border-box;
 }
 
+.speed-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    padding: 6px;
+    background-color: #2c313a;
+    border-radius: 8px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.speed-label {
+    color: #e0e0e0;
+    font-size: 0.9em;
+    font-weight: 500;
+    min-width: 45px;
+}
+
+.speed-buttons {
+    display: flex;
+    gap: 4px;
+    flex-grow: 1;
+}
+
+.speed-button {
+    background-color: #4a5058;
+    color: #ffffff;
+    border: 2px solid #6c757d;
+    padding: 4px 8px;
+    font-size: 11px;
+    font-weight: 500;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, border-color 0.2s ease;
+    flex-grow: 1;
+}
+
+.speed-button:hover:not(:disabled) {
+    background-color: #5a6268;
+    border-color: #888e99;
+}
+
+.speed-button.selected {
+    background-color: #17a2b8;
+    border-color: #117a8b;
+    box-shadow: 0 0 8px rgba(23, 162, 184, 0.6);
+}
+
+.speed-button:disabled {
+    background-color: #3a3f47;
+    color: #888c92;
+    border-color: #4a5058;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
 .chips-container { display: flex; justify-content: center; gap: 5px; flex-wrap: wrap; }
 .chip {
     width: 32px; height: 32px; border-radius: 50%; border: 2px solid #4f545c;
