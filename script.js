@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const startButton = document.getElementById('startButton');
     const simulate10xButton = document.getElementById('simulate10xButton');
     const simulate100xButton = document.getElementById('simulate100xButton');
+    const simulate1000xButton = document.getElementById('simulate1000xButton');
     const cancelSimulationButton = document.getElementById('cancelSimulationButton');
     const resultDisplay = document.getElementById('resultDisplay');
     const timerElement = document.getElementById('countdownTimer');
@@ -113,6 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
             startButton.disabled = false;
             simulate10xButton.disabled = false;
             simulate100xButton.disabled = false;
+            simulate1000xButton.disabled = false;
             cancelSimulationButton.style.display = 'none';
         } else {
             cancelSimulationButton.style.display = 'block';
@@ -298,6 +300,7 @@ document.addEventListener('DOMContentLoaded', () => {
         startButton.disabled = simulationRunning || isMultiRunning;
         simulate10xButton.disabled = simulationRunning || isMultiRunning;
         simulate100xButton.disabled = simulationRunning || isMultiRunning;
+        simulate1000xButton.disabled = simulationRunning || isMultiRunning;
         cancelSimulationButton.style.display = isMultiRunning ? 'block' : 'none';
         // Update cancel button text with remaining spins if running
         if (isMultiRunning && multiRunRemaining > 0) {
@@ -418,6 +421,7 @@ document.addEventListener('DOMContentLoaded', () => {
             startButton.disabled = false;
             simulate10xButton.disabled = false;
             simulate100xButton.disabled = false;
+            simulate1000xButton.disabled = false;
             cancelSimulationButton.style.display = 'none';
         }
     }
@@ -589,7 +593,7 @@ document.addEventListener('DOMContentLoaded', () => {
             payoutMessageDisplay.textContent = `Multi-run stopped. Insufficient bankroll ($${bankroll.toFixed(2)}) for next bet ($${currentBetAmount.toFixed(2)}).`;
             payoutMessageDisplay.className = 'payout-message lose';
             isMultiRunning = false; multiRunRemaining = 0; multiRunCancelRequested = false;
-            startButton.disabled = false; simulate10xButton.disabled = false; simulate100xButton.disabled = false; cancelSimulationButton.style.display = 'none';
+            startButton.disabled = false; simulate10xButton.disabled = false; simulate100xButton.disabled = false; simulate1000xButton.disabled = false; cancelSimulationButton.style.display = 'none';
             updateChipStates();
             updateSpeedButtons();
             return;
@@ -598,7 +602,7 @@ document.addEventListener('DOMContentLoaded', () => {
             isMultiRunning = false; multiRunRemaining = 0; multiRunCancelRequested = false;
             updateChipStates();
             updateSpeedButtons();
-            startButton.disabled = false; simulate10xButton.disabled = false; simulate100xButton.disabled = false; cancelSimulationButton.style.display = 'none';
+            startButton.disabled = false; simulate10xButton.disabled = false; simulate100xButton.disabled = false; simulate1000xButton.disabled = false; cancelSimulationButton.style.display = 'none';
             if (multiRunCancelRequested) {
                  payoutMessageDisplay.textContent = `Multi-run cancelled. ${payoutMessageDisplay.textContent}`;
             } else if (multiRunRemaining <=0 && !multiRunCancelRequested) {
@@ -655,7 +659,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             if (simulationRunning || isMultiRunning) return;
 
-            startButton.disabled = true; simulate10xButton.disabled = true; simulate100xButton.disabled = true;
+            startButton.disabled = true; simulate10xButton.disabled = true; simulate100xButton.disabled = true; simulate1000xButton.disabled = true;
             simulationRunning = true;
             updateChipStates();
 
@@ -695,7 +699,7 @@ document.addEventListener('DOMContentLoaded', () => {
              multiRunTarget = 10;
              multiRunRemaining = 10;
              multiRunCancelRequested = false;
-             startButton.disabled = true; simulate10xButton.disabled = true; simulate100xButton.disabled = true;
+             startButton.disabled = true; simulate10xButton.disabled = true; simulate100xButton.disabled = true; simulate1000xButton.disabled = true;
              cancelSimulationButton.style.display = 'block';
              cancelSimulationButton.disabled = false;
              updateChipStates();
@@ -721,7 +725,33 @@ document.addEventListener('DOMContentLoaded', () => {
              multiRunTarget = 100;
              multiRunRemaining = 100;
              multiRunCancelRequested = false;
-             startButton.disabled = true; simulate10xButton.disabled = true; simulate100xButton.disabled = true;
+             startButton.disabled = true; simulate10xButton.disabled = true; simulate100xButton.disabled = true; simulate1000xButton.disabled = true;
+             cancelSimulationButton.style.display = 'block';
+             cancelSimulationButton.disabled = false;
+             updateChipStates();
+             startSingleSimulationCycle();
+        });
+
+        simulate1000xButton.addEventListener('click', () => {
+             if (currentBetAmount > 0 && !selectedBetType) {
+                 payoutMessageDisplay.textContent = "Please select 'Bet Center In' or 'Bet Center Out'.";
+                 payoutMessageDisplay.className = 'payout-message lose'; return;
+             }
+             if (currentBetAmount === 0) {
+                  payoutMessageDisplay.textContent = "Please place a bet first.";
+                  payoutMessageDisplay.className = 'payout-message lose'; return;
+             }
+             if (bankroll < currentBetAmount) {
+                 payoutMessageDisplay.textContent = `Insufficient bankroll ($${bankroll.toFixed(2)}) for bet ($${currentBetAmount.toFixed(2)}).`;
+                 payoutMessageDisplay.className = 'payout-message lose'; return;
+             }
+             if (simulationRunning || isMultiRunning) return;
+
+             isMultiRunning = true;
+             multiRunTarget = 1000;
+             multiRunRemaining = 1000;
+             multiRunCancelRequested = false;
+             startButton.disabled = true; simulate10xButton.disabled = true; simulate100xButton.disabled = true; simulate1000xButton.disabled = true;
              cancelSimulationButton.style.display = 'block';
              cancelSimulationButton.disabled = false;
              updateChipStates();

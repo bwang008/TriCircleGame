@@ -295,6 +295,32 @@ button#simulate100xButton:disabled {
     transform: none;
 }
 
+button#simulate1000xButton {
+    background-color: #20c997; /* Teal */
+    color: #ffffff;
+    border: none;
+    padding: 7px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out, transform 0.1s ease;
+    flex-grow: 1;
+    max-width: 100px;
+    box-shadow: 0 3px 8px rgba(32, 201, 151, 0.2);
+}
+button#simulate1000xButton:hover:not(:disabled) {
+    background-color: #1ba87e;
+    transform: translateY(-1px);
+}
+button#simulate1000xButton:disabled {
+    background-color: #4a5058;
+    color: #888c92;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+}
+
 button#startButton:disabled, button#simulate10xButton:disabled {
     background-color: #4a5058; color: #888c92; cursor: not-allowed; box-shadow: none; transform: none;
 }
